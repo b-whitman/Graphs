@@ -1,4 +1,5 @@
 import random
+from util import Queue
 
 class User:
     def __init__(self, name):
@@ -70,6 +71,36 @@ class SocialGraph:
         for friendship in friendships_to_make:
             self.add_friendship(friendship[0], friendship[1])
 
+    def get_friends(self, user_id):
+        """
+        Return 
+        """
+        return self.friendships[user_id]
+
+    def bfs(self, starting_vertex, destination_vertex):
+        """
+        Return a list containing the shortest path from
+        starting_vertex to destination_vertex in
+        breath-first order.
+        """
+        q = Queue()
+        visited = set()
+        q.enqueue([starting_vertex])
+
+        while q.size() > 0:
+            current_path = q.dequeue()
+            current_node = current_path[-1]
+
+            if current_node == destination_vertex:
+                return current_path
+            if current_node not in visited:
+                visited.add(current_node)
+
+                friends = self.get_friends(current_node)
+                for friend in friends:
+                    path_copy = current_path + [friend]
+                    q.enqueue(path_copy)
+
     def get_all_social_paths(self, user_id):
         """
         Takes a user's user_id as an argument
@@ -80,13 +111,19 @@ class SocialGraph:
         The key is the friend's ID and the value is the path.
         """
         visited = {}  # Note that this is a dictionary, not a set
-        # !!!! IMPLEMENT ME
+        for user in self.users:
+            path = self.bfs(user_id, user)
+            if path != None and len(path) <= 4:
+                visited[user] = path
         return visited
 
 
 if __name__ == '__main__':
     sg = SocialGraph()
-    sg.populate_graph(10, 2)
-    print(sg.friendships)
+    sg.populate_graph(1000, 5)
+    print(len(sg.friendships[1]))
+    print(sg.friendships[1])
     connections = sg.get_all_social_paths(1)
+    print(len(connections))
+    # 134, 95, 85, 122, 232, 172, 109, 3:45, 252, 2:64, 8:195, 6:171, 3:98, 6:125, 3:115, 3:100, 4:85, 
     print(connections)
