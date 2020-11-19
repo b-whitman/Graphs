@@ -55,7 +55,7 @@ The path to the user, as returned by a breadth-first search
 Prior to actually completing this assignment, I think the answer will be 5^3 = 125, / 1000 = 12.5%.
 After coding it out, yeah, 12.5% seems feasible?
 
-
+Edit: Partially misunderstood the prompt- I thought only friends of friends' friends counted as "extended network"
 ## 4. Stretch Goal
 
 1. You might have found the results from question #2 above to be surprising. Would you expect results like this in real life? If not, what are some ways you could improve your friendship distribution model for more realistic results?

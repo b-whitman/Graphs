@@ -72,9 +72,7 @@ class SocialGraph:
             self.add_friendship(friendship[0], friendship[1])
 
     def get_friends(self, user_id):
-        """
-        Return 
-        """
+
         return self.friendships[user_id]
 
     def bfs(self, starting_vertex, destination_vertex):
@@ -113,7 +111,7 @@ class SocialGraph:
         visited = {}  # Note that this is a dictionary, not a set
         for user in self.users:
             path = self.bfs(user_id, user)
-            if path != None and len(path) <= 4:
+            if path != None:
                 visited[user] = path
         return visited
 
