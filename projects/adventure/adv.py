@@ -5,16 +5,52 @@ from world import World
 import random
 from ast import literal_eval
 
+class Queue():
+    def __init__(self):
+        self.queue = []
+    def enqueue(self, value):
+        self.queue.append(value)
+    def dequeue(self):
+        if self.size() > 0:
+            return self.queue.pop(0)
+        else:
+            return None
+    def size(self):
+        return len(self.queue)
+
+def find_unexplored(starting_vertex, traversal_graph):
+    """
+    Return a list containing the path to a room with an unexplored exit
+    """
+    q = Queue()
+    visited = set()
+    q.enqueue([starting_vertex])
+
+    while q.size() > 0:
+        current_path = q.dequeue()
+        current_node = current_path[-1]
+
+        for value in traversal_graph[current_node].values():
+            if value == '?':
+                return current_path
+        if current_node not in visited:
+            visited.add(current_node)
+
+            neighbors = traversal_graph[current_node].values()
+            for neighbor in neighbors:
+                path_copy = current_path + [neighbor]
+                q.enqueue(path_copy)
+
 # Load world
 world = World()
 
 
 # You may uncomment the smaller graphs for development and testing purposes.
-map_file = "maps/test_line.txt"
+# map_file = "maps/test_line.txt"
 # map_file = "maps/test_cross.txt"
 # map_file = "maps/test_loop.txt"
 # map_file = "maps/test_loop_fork.txt"
-# map_file = "maps/main_maze.txt"
+map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
 room_graph=literal_eval(open(map_file, "r").read())
@@ -33,12 +69,12 @@ dir_dict = {'n': 's',
             's': 'n',
             'e': 'w',
             'w': 'e'}
-print(traversal_graph)
 
+
+# Main traversal loop
 while len(traversal_graph) < len(world.rooms):
     # Could be a list comp
     unexplored_exits = []
-    print(player.current_room.id)
     for key, value in traversal_graph[player.current_room.id].items():
         if value == '?':
             unexplored_exits.append(key)
@@ -54,10 +90,13 @@ while len(traversal_graph) < len(world.rooms):
             traversal_graph[player.current_room.id] = {dir : '?' for dir in player.current_room.get_exits()}
         traversal_graph[prev_room][direction] = player.current_room.id
         traversal_graph[player.current_room.id][dir_dict[direction]] = prev_room
-    
-    # Take steps in a DFS
-    # Update traversal_path with each step taken
-    # Update traversal_graph each time you visit a new room
+    elif len(unexplored_exits) == 0:
+        path = find_unexplored(player.current_room.id, traversal_graph)
+        for node in path[1:]:
+            for key, value in traversal_graph[player.current_room.id].items():
+                if value == node:
+                    player.travel(key)
+                    traversal_path.append(key)
 
 
 # TRAVERSAL TEST
