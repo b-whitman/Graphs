@@ -64,36 +64,47 @@ player = Player(world.starting_room)
 # Fill this out with directions to walk
 # traversal_path = ['n', 'n']
 traversal_path = []
-traversal_graph = {player.current_room.id : {dir : '?' for dir in player.current_room.get_exits()}}
-dir_dict = {'n': 's',
-            's': 'n',
-            'e': 'w',
-            'w': 'e'}
+traversal_graph = {player.current_room.id : 
+    {dir : '?' for dir in player.current_room.get_exits()}}
+
+# Used to transform list of rooms into list of directions
+direction_dict = {'n': 's',
+                  's': 'n',
+                  'e': 'w',
+                  'w': 'e'}
 
 
 # Main traversal loop
 while len(traversal_graph) < len(world.rooms):
     # Could be a list comp
+    current_room = player.current_room.id
     unexplored_exits = []
-    for key, value in traversal_graph[player.current_room.id].items():
+    for key, value in traversal_graph[current_room].items():
         if value == '?':
             unexplored_exits.append(key)
+    
     if len(unexplored_exits) > 0:
         # Pick a direction and travel
         direction = random.choice(unexplored_exits)
-        prev_room = player.current_room.id
+        prev_room = current_room
         player.travel(direction)
         traversal_path.append(direction)
 
         # Update traversal_graph
-        if player.current_room.id not in traversal_graph:
-            traversal_graph[player.current_room.id] = {dir : '?' for dir in player.current_room.get_exits()}
-        traversal_graph[prev_room][direction] = player.current_room.id
-        traversal_graph[player.current_room.id][dir_dict[direction]] = prev_room
+        current_room = player.current_room.id
+        if current_room not in traversal_graph:
+            traversal_graph[current_room] = {
+                dir : '?' for dir in player.current_room.get_exits()
+                }
+
+        # Update known connections
+        traversal_graph[prev_room][direction] = current_room
+        traversal_graph[current_room][direction_dict[direction]] = prev_room
+
     elif len(unexplored_exits) == 0:
-        path = find_unexplored(player.current_room.id, traversal_graph)
+        path = find_unexplored(current_room, traversal_graph)
         for node in path[1:]:
-            for key, value in traversal_graph[player.current_room.id].items():
+            for key, value in traversal_graph[current_room].items():
                 if value == node:
                     player.travel(key)
                     traversal_path.append(key)
